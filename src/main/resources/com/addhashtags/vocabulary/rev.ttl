@@ -1,0 +1,223 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix dctype: <http://purl.org/dc/dcmitype/> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix data-view: <http://www.w3.org/2003/g/data-view#> .
+@prefix status: <http://www.w3.org/2003/06/sw-vocab-status/ns#> .
+@prefix ns0: <http://vocab.org/review/> .
+@prefix vann: <http://purl.org/vocab/vann/> .
+@prefix ns1: <http://purl.org/stuff/> .
+@prefix msg0: <http://web.resource.org/cc/> .
+@prefix ns2: <http://purl.org/stuff/rev#> .
+
+<http://vocab.org/review/terms.turtle> rdf:type foaf:Document ,
+                                                dctype:Text ;
+                                       foaf:primaryTopic <http://purl.org/stuff/rev#> ;
+                                       dct:hasFormat <http://vocab.org/review/terms.rdf> ,
+                                                     <http://vocab.org/review/terms.html> ,
+                                                     <http://vocab.org/review/terms.json> ;
+                                       foaf:topic <http://purl.org/stuff/rev#> .
+
+<http://vocab.org/review/terms.rdf> rdf:type dctype:Text ,
+                                             foaf:Document ;
+                                    dc:format "application/rdf+xml" ;
+                                    rdfs:label "RDF/XML" .
+
+<http://vocab.org/review/terms.html> rdf:type dctype:Text ,
+                                              foaf:Document ;
+                                     dc:format "text/html" ;
+                                     rdfs:label "HTML" .
+
+<http://vocab.org/review/terms.json> rdf:type dctype:Text ,
+                                              foaf:Document ;
+                                     dc:format "application/json" ;
+                                     rdfs:label "JSON" .
+
+<http://purl.org/stuff/rev#> rdf:type owl:Ontology ,
+                                      owl:Thing ;
+                             rdfs:label "RDF Review Vocabulary" ;
+                             dc:description "Vocabulary for expressing reviews and ratings using the Resource Description Framework. It is compatible with hReview and conforms to OWL Lite" ;
+                             dc:date "2007-11-08" ;
+                             data-view:profileTransformation <http://danja.talis.com/xmlns/rev_2007-11-09/hreview2rdfxml.xsl> ;
+                             status:userdocs ns0:html ;
+                             vann:preferredNamespaceUri "http://purl.org/stuff/rev#" ;
+                             vann:preferredNamespacePrefix "rev" .
+
+ns1:rev rdf:type msg0:Work ;
+        msg0:license <http://creativecommons.org/licenses/by/1.0/> ;
+        dc:type dctype:Text .
+
+<http://creativecommons.org/licenses/by/1.0/> rdf:type msg0:License ;
+                                              msg0:permits msg0:Reproduction ,
+                                                           msg0:Distribution ,
+                                                           msg0:DerivativeWorks ;
+                                              msg0:requires msg0:Notice ,
+                                                            msg0:Attribution .
+
+ns2:Review rdf:type rdfs:Class ,
+                    owl:Class ;
+           rdfs:label "Review"@en ;
+           rdfs:comment "A review of an work"@en ;
+           rdfs:isDefinedBy <http://purl.org/stuff/rev#> ;
+           status:term_status "stable" ;
+           status:moreinfo "core term" .
+
+ns2:rating rdf:type rdf:Property ,
+                    owl:DatatypeProperty ;
+           rdfs:label "rating"@en ;
+           rdfs:comment "A numeric value"@en ;
+           rdfs:isDefinedBy <http://purl.org/stuff/rev#> ;
+           status:term_status "stable" ;
+           status:moreinfo "core term" .
+
+ns2:text rdf:type rdf:Property ,
+                  owl:DatatypeProperty ;
+         rdfs:label "text"@en ;
+         rdfs:comment "The text of the review"@en ;
+         rdfs:isDefinedBy <http://purl.org/stuff/rev#> ;
+         status:term_status "stable" ;
+         status:moreinfo "core term" .
+
+ns2:hasReview rdf:type rdf:Property ,
+                       owl:ObjectProperty ;
+              rdfs:label "has Review"@en ;
+              rdfs:comment "Associates a work with a a review"@en ;
+              rdfs:domain rdfs:Resource ;
+              rdfs:range ns2:Review ;
+              rdfs:isDefinedBy <http://purl.org/stuff/rev#> ;
+              status:term_status "stable" ;
+              status:moreinfo "core term" .
+
+ns2:reviewer rdf:type rdf:Property ,
+                      owl:ObjectProperty ;
+             rdfs:label "reviewer"@en ;
+             rdfs:comment "The person that has written the review"@en ;
+             rdfs:domain ns2:Review ;
+             rdfs:range foaf:Person ;
+             rdfs:isDefinedBy <http://purl.org/stuff/rev#> ;
+             status:term_status "stable" ;
+             status:moreinfo "core term" .
+
+ns2:minRating rdf:type rdf:Property ;
+              rdfs:label "min Rating"@en ;
+              rdfs:comment "A numeric value"@en ;
+              dc:description "Minimum value for rating property"@en ;
+              rdfs:isDefinedBy <http://purl.org/stuff/rev#> ;
+              status:term_status "stable" ;
+              status:moreinfo "Introduced by request of Revyu.com" .
+
+ns2:maxRating rdf:type rdf:Property ;
+              rdfs:label "max Rating"@en ;
+              rdfs:comment "A numeric value"@en ;
+              dc:description "Maximum value for rating property"@en ;
+              rdfs:isDefinedBy <http://purl.org/stuff/rev#> ;
+              status:term_status "stable" ;
+              status:moreinfo "Introduced by request of Revyu.com" .
+
+ns2:type rdf:type rdf:Property ,
+                  owl:DatatypeProperty ;
+         rdfs:label "type" ;
+         rdfs:comment "The type of media of a work under review" ;
+         rdfs:isDefinedBy <http://purl.org/stuff/rev#> ;
+         status:term_status "deprecated" ;
+         status:moreinfo "core term" .
+
+ns2:Comment rdf:type rdfs:Class ,
+                     owl:Class ;
+            rdfs:label "Comment" ;
+            rdfs:comment "A comment on a review" ;
+            rdfs:isDefinedBy <http://purl.org/stuff/rev#> ;
+            status:term_status "deprecated" ;
+            status:moreinfo "proposed by iterating.com" .
+
+ns2:Feedback rdf:type rdfs:Class ,
+                      owl:Class ;
+             rdfs:isDefinedBy <http://purl.org/stuff/rev#> ;
+             status:term_status "testing" ,
+                                "deprecated" ;
+             rdfs:comment "Feedback on the review. Expresses whether the review was useful or not" ;
+             rdfs:label "Feedback" ;
+             status:moreinfo "proposed by iterating.com" .
+
+ns2:hasFeedback rdf:type rdf:Property ,
+                         owl:ObjectProperty ;
+                rdfs:label "hasFeedback" ;
+                rdfs:comment "Associates a review with a feedback on the review" ;
+                rdfs:isDefinedBy <http://purl.org/stuff/rev#> ;
+                rdfs:range ns2:Feedback ;
+                rdfs:domain ns2:Review ;
+                status:term_status "deprecated" ;
+                status:moreinfo "proposed by iterating.com" .
+
+ns2:totalVotes rdf:type rdf:Property ,
+                        owl:DatatypeProperty ;
+               rdfs:label "totalVotes" ;
+               rdfs:comment "Number of usefulness votes (integer)" ;
+               rdfs:isDefinedBy <http://purl.org/stuff/rev#> ;
+               rdfs:range rdfs:Literal ;
+               rdfs:domain ns2:Review ;
+               status:term_status "deprecated" ;
+               status:moreinfo "proposed by iterating.com" .
+
+ns2:commenter rdf:type rdf:Property ,
+                       owl:ObjectProperty ;
+              rdfs:label "commenter" ;
+              rdfs:comment "The commenter on the review" ;
+              rdfs:isDefinedBy <http://purl.org/stuff/rev#> ;
+              rdfs:range foaf:Agent ;
+              rdfs:domain ns2:Feedback ,
+                          ns2:Comment ;
+              status:term_status "deprecated" ;
+              status:moreinfo "proposed by iterating.com" .
+
+ns2:positiveVotes rdf:type rdf:Property ,
+                           owl:DatatypeProperty ;
+                  rdfs:label "positiveVotes" ;
+                  rdfs:isDefinedBy <http://purl.org/stuff/rev#> ;
+                  rdfs:range rdfs:Literal ;
+                  rdfs:domain ns2:Review ;
+                  rdfs:comment "Number of positive usefulness votes (integer)" ;
+                  status:term_status "deprecated" ;
+                  status:moreinfo "proposed by iterating.com" .
+
+ns2:title rdf:type rdf:Property ,
+                   owl:DatatypeProperty ;
+          rdfs:label "title" ;
+          rdfs:comment "The title of the review" ;
+          rdfs:isDefinedBy <http://purl.org/stuff/rev#> ;
+          rdfs:subPropertyOf dc:title ;
+          rdfs:range rdfs:Literal ;
+          rdfs:domain ns2:Review ;
+          status:term_status "deprecated" ;
+          status:moreinfo "proposed by iterating.com" .
+
+ns2:hasComment rdf:type rdf:Property ,
+                        owl:ObjectProperty ;
+               rdfs:label "hasComment" ;
+               rdfs:isDefinedBy <http://purl.org/stuff/rev#> ;
+               rdfs:range ns2:Comment ;
+               rdfs:domain ns2:Review ;
+               rdfs:comment "Used to associate a review with a comment on the review" ;
+               status:term_status "deprecated" ;
+               status:moreinfo "proposed by iterating.com" .
+
+rdfs:Class rdf:type owl:Class .
+
+rdfs:Resource rdf:type owl:Class .
+
+foaf:Agent rdf:type owl:Class .
+
+foaf:Person rdf:type owl:Class .
+
+dc:date rdf:type owl:DatatypeProperty .
+
+dc:title rdf:type owl:DatatypeProperty .
+
+dc:description rdf:type owl:DatatypeProperty .
+
+status:term_status rdf:type owl:AnnotationProperty .
+
+status:moreinfo rdf:type owl:AnnotationProperty .

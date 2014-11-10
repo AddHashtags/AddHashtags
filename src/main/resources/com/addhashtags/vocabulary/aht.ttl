@@ -1,0 +1,255 @@
+@base           <http://addhashtags.com/aht> .
+
+@prefix gcs:    <http://graphity.org/gcs#> .
+@prefix gc:     <http://graphity.org/gc#> .
+@prefix gp:	<http://graphity.org/gp#> .
+@prefix gs:	<http://graphity.org/gs#> .
+@prefix rdf:	<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:	<http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:	<http://www.w3.org/2001/XMLSchema#> .
+@prefix owl:	<http://www.w3.org/2002/07/owl#> .
+@prefix skos:   <http://www.w3.org/2004/02/skos/core#> .
+@prefix ldp:	<http://www.w3.org/ns/ldp#> .
+@prefix dct:	<http://purl.org/dc/terms/> .
+@prefix gr:     <http://purl.org/goodrelations/v1#> .
+@prefix lda:	<http://purl.org/linked-data/api/vocab#> .
+@prefix sp:	<http://spinrdf.org/sp#> .
+@prefix spin:	<http://spinrdf.org/spin#> .
+@prefix spl:	<http://spinrdf.org/spl#> .
+@prefix sioc:	<http://rdfs.org/sioc/ns#> .
+@prefix foaf:	<http://xmlns.com/foaf/0.1/> .
+@prefix nfo:    <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#> .
+@prefix dqc:	<http://semwebquality.org/ontologies/dq-constraints#> .
+@prefix rev:    <http://purl.org/stuff/rev#> .
+
+<#> a owl:Ontology, gp:Sitemap ;
+    owl:imports gcs:, gc:, sp:, spin:, nfo:, lda:, foaf:, sioc:, rev: ;
+    rdfs:comment "Add Hash Tags sitemap" .
+
+# PROPERTIES
+
+<#isReviewOf> a owl:ObjectProperty ;
+    owl:inverseOf rev:hasReview ;
+    rdfs:label "Is review of" ;
+    rdfs:isDefinedBy <#> .
+
+# CLASSES
+
+<#Space> a owl:Class, gp:Template ;
+    rdfs:subClassOf foaf:Document, ldp:Container, sioc:Container, lda:ListEndpoint ;
+    gp:uriTemplate "/" ;
+    gp:limit 20 ;
+    # gp:cacheControl "public, max-age=86400" ;
+    spin:query gp:DescribeWithChildren ;
+    rdfs:label "Space" ;
+    rdfs:isDefinedBy <#> .
+
+# products
+
+<#ProductContainer> a owl:Class, gp:Template ;
+    rdfs:subClassOf foaf:Document, ldp:Container, sioc:Container, lda:ListEndpoint ;
+    gp:uriTemplate "/products" ; 
+    gp:limit 20 ;
+    gp:orderBy "name"^^xsd:string ;
+    gc:mode gc:ListMode, gc:TableMode, gc:CreateMode ;
+    # gc:defaultMode gc:ListMode ;
+    # gp:cacheControl "public, max-age=86400" ;
+    spin:query gp:DescribeWithChildren ;
+    rdfs:label "Products container" ;
+    rdfs:isDefinedBy <#> .
+
+<#ProductItem> a rdfs:Class, owl:Class, gp:Template ;
+    rdfs:subClassOf foaf:Document, lda:ItemEndpoint , # <#Document>
+        [ a owl:Restriction ;
+            owl:onProperty sioc:has_container ;
+            owl:allValuesFrom <#ProductContainer>
+        ] ;
+    gp:uriTemplate "/products/{slug}" ;
+    gc:mode gc:ReadMode ;
+    gc:defaultMode gc:ReadMode ;
+    # gp:cacheControl "public, max-age=86400" ;
+    spin:query gp:DescribeWithTopic ;
+    spin:update gp:DeleteWithTopic ;
+    spin:constructor
+              [ a       sp:Construct ;
+                sp:text """
+                    PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#>
+                    PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>
+                    PREFIX owl:     <http://www.w3.org/2002/07/owl#>
+                    PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
+                    PREFIX sioc:    <http://rdfs.org/sioc/ns#>
+                    PREFIX gp:      <http://graphity.org/gp#>
+                    PREFIX aht:     <http://addhashtags.com/aht#>
+                    PREFIX gr:      <http://purl.org/goodrelations/v1#>
+
+                    CONSTRUCT {
+                        ?this a foaf:Document, aht:ProductItem ;
+                            foaf:primaryTopic _:product ;
+                            gp:slug " "^^xsd:string .
+                        _:product a aht:ProductOrServiceModel, gr:ProductOrServiceModel ;
+                            foaf:isPrimaryTopicOf ?this ;
+                            gr:name " " .
+                    }
+                    WHERE {}"""
+              ] ;
+    rdfs:label "Product document" ;
+    rdfs:isDefinedBy <#> .
+
+<#ProductOrServiceModel> a rdfs:Class, owl:Class ;
+    rdfs:subClassOf gr:ProductOrServiceModel ,
+        [ a owl:Restriction ;
+            owl:onProperty foaf:isPrimaryTopicOf ;
+            owl:allValuesFrom <#ProductDocument>
+	] ;
+    gp:uriTemplate "/products/{isPrimaryTopicOf.slug}" ;
+    spin:constraint <#ConstructTypeViolation> , <#ConstructCategoryViolation> ,
+        [ a dqc:MissingProperties ;
+	    sp:arg1 <#ProductOrServiceModel> ;
+	    sp:arg2 foaf:isPrimaryTopicOf
+	] ,
+        [ a dqc:MissingProperties ;
+	    sp:arg1 <#ProductOrServiceModel> ;
+	    sp:arg2 gr:hasMPN
+	] ,
+        [ a dqc:MissingProperties ;
+	    sp:arg1 <#ProductOrServiceModel> ;
+	    sp:arg2 gr:name
+	] ;
+    rdfs:isDefinedBy <#> .
+
+# categories
+
+<#CategoryContainer> a owl:Class, gp:Template ;
+    rdfs:subClassOf foaf:Document, gp:Container, sioc:Container, ldp:Container, lda:ListEndpoint ;
+    gp:uriTemplate "/categories" ;
+    gp:limit 20 ;
+    gp:orderBy "prefLabel"^^xsd:string ;
+    gc:defaultMode gc:ListMode ;
+    gc:mode gc:ReadMode, gc:ListMode, gc:TableMode, gc:CreateMode ;
+    spin:query gp:DescribeWithChildren ;
+    rdfs:label "Category container" ;
+    rdfs:isDefinedBy <#> .
+
+<#CategoryItem> a rdfs:Class, owl:Class, gp:Template ;
+    rdfs:subClassOf foaf:Document, gp:Item, sioc:Item, lda:ItemEndpoint ,
+        [ a owl:Restriction ;
+            owl:onProperty sioc:has_container ;
+            owl:allValuesFrom <#CategoryContainer>
+        ] ;
+    gp:uriTemplate "/categories/{slug}" ;
+    gp:skolemTemplate "/{slug}" ;
+    gc:mode gc:ReadMode, gc:EditMode ;
+    gc:defaultMode gc:ReadMode ;
+    gp:cacheControl "public, max-age=3600" ;
+    spin:query gp:DescribeWithTopic ;
+    spin:update gp:DeleteWithTopic ;
+    spin:constructor
+              [ a       sp:Construct ;
+                sp:text """
+                    PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#>
+                    PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>
+                    PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
+                    PREFIX sioc:    <http://rdfs.org/sioc/ns#>
+                    PREFIX gp:      <http://graphity.org/gp#>
+                    PREFIX aht:     <http://addhashtags.com/aht#>
+                    PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
+
+                    CONSTRUCT {
+                        ?this a foaf:Document, aht:CategoryItem ;
+                            foaf:primaryTopic _:category ;
+                            gp:slug " "^^xsd:string .
+                        _:category a aht:Category, skos:Concept ;
+                            foaf:isPrimaryTopicOf ?this ;
+                            skos:prefLabel " " .
+                    }
+                    WHERE {}"""
+              ] ;
+    spin:constraint [ a dqc:MissingProperties ;
+	    sp:arg1 <#CategoryItem> ;
+	    sp:arg2 gp:slug
+	] ;
+    rdfs:label "Category document" ;
+    rdfs:isDefinedBy <#> .
+
+<#Category> a rdfs:Class, owl:Class ;
+    rdfs:subClassOf skos:Concept,
+        [ a owl:Restriction ;
+            owl:onProperty foaf:isPrimaryTopicOf ;
+            owl:allValuesFrom <#CategoryItem>
+	] ;
+    gp:skolemTemplate "/{isPrimaryTopicOf.slug}" ;
+    spin:constraint [ a dqc:MissingProperties ;
+	    sp:arg1 <#Category> ;
+	    sp:arg2 skos:prefLabel
+	] ;
+    rdfs:label "Category" ;
+    rdfs:isDefinedBy <#> .
+
+# reviews
+
+<#ReviewContainer> a owl:Class, gp:Template ;
+    rdfs:subClassOf foaf:Document, gp:Container, sioc:Container, ldp:Container, lda:ListEndpoint ;
+    gp:uriTemplate "/reviews" ;
+    gp:limit 20 ;
+    gp:orderBy "title"^^xsd:string ;
+    gc:defaultMode gc:ListMode ;
+    gc:mode gc:ReadMode, gc:ListMode, gc:TableMode, gc:CreateMode ;
+    spin:query gp:DescribeWithChildren ;
+    rdfs:label "Review container" ;
+    rdfs:isDefinedBy <#> .
+
+<#ReviewItem> a rdfs:Class, owl:Class, gp:Template ;
+    rdfs:subClassOf foaf:Document, gp:Item, sioc:Item, lda:ItemEndpoint ,
+        [ a owl:Restriction ;
+            owl:onProperty sioc:has_container ;
+            owl:allValuesFrom <#ReviewContainer>
+        ] ;
+    gp:uriTemplate "/reviews/{slug}" ;
+    gp:skolemTemplate "/{slug}" ;
+    gc:mode gc:ReadMode, gc:EditMode ;
+    gc:defaultMode gc:ReadMode ;
+    gp:cacheControl "public, max-age=3600" ;
+    spin:query gp:DescribeWithTopic ;
+    spin:update gp:DeleteWithTopic ;
+    spin:constructor
+              [ a       sp:Construct ;
+                sp:text """
+                    PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#>
+                    PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>
+                    PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
+                    PREFIX sioc:    <http://rdfs.org/sioc/ns#>
+                    PREFIX gp:      <http://graphity.org/gp#>
+                    PREFIX aht:     <http://addhashtags.com/aht#>
+                    PREFIX rev:     <http://purl.org/stuff/rev#>
+
+                    CONSTRUCT {
+                        ?this a foaf:Document, aht:ReviewItem ;
+                            foaf:primaryTopic _:review ;
+                            gp:slug " "^^xsd:string .
+                        _:review a aht:Review, rev:Review ;
+                            foaf:isPrimaryTopicOf ?this ;
+                            rev:title " " ;
+                            aht:isReviewOf _:product .
+                    }
+                    WHERE {}"""
+              ] ;
+    spin:constraint [ a dqc:MissingProperties ;
+	    sp:arg1 <#ReviewItem> ;
+	    sp:arg2 gp:slug
+	] ;
+    rdfs:label "Review document" ;
+    rdfs:isDefinedBy <#> .
+
+<#Review> a rdfs:Class, owl:Class ;
+    rdfs:subClassOf rev:Review,
+        [ a owl:Restriction ;
+            owl:onProperty foaf:isPrimaryTopicOf ;
+            owl:allValuesFrom <#ReviewItem>
+	] ;
+    gp:skolemTemplate "/{isPrimaryTopicOf.slug}" ;
+    spin:constraint [ a dqc:MissingProperties ;
+	    sp:arg1 <#Review> ;
+	    sp:arg2 rev:title
+	] ;
+    rdfs:label "Review" ;
+    rdfs:isDefinedBy <#> .

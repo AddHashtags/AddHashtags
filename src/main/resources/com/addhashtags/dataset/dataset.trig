@@ -1,0 +1,57 @@
+@prefix rdf:	<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:	<http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:	<http://www.w3.org/2001/XMLSchema#> .
+@prefix ldp:	<http://www.w3.org/ns/ldp#> .
+@prefix dct:	<http://purl.org/dc/terms/> .
+@prefix lda:	<http://purl.org/linked-data/api/vocab#> .
+@prefix void:	<http://rdfs.org/ns/void#> .
+@prefix sioc:	<http://rdfs.org/sioc/ns#> .
+@prefix foaf:	<http://xmlns.com/foaf/0.1/> .
+@prefix gc:     <http://graphity.org/gc#> .
+@prefix gp:	<http://graphity.org/gp#> .
+@prefix gcs:	<http://graphity.org/gcs#> .
+
+<> a sioc:Space, ldp:Container, foaf:Document ;
+    dct:title "Add Hash Tags" ;
+    dct:description "User reviews about experiences" ;
+    foaf:maker <http://graphityhq.com/#company> .
+
+# containers
+
+<products> a ldp:Container, sioc:Container, foaf:Document ;
+    gp:slug "products"^^xsd:string ;
+    sioc:has_space <> ;
+    dct:title "Products" .
+
+<consumers> a ldp:Container, sioc:Container, foaf:Document ;
+    gp:slug "consumers"^^xsd:string ;
+    sioc:has_space <> ;
+    dct:title "Consumers" .
+
+<producers> a ldp:Container, sioc:Container, foaf:Document ;
+    gp:slug "producers"^^xsd:string ;
+    sioc:has_space <> ;
+    dct:title "Producers" .
+
+<categories> a ldp:Container, sioc:Container, foaf:Document ;
+    gp:slug "categories"^^xsd:string ;
+    sioc:has_space <> ;
+    dct:title "Categories" .
+
+<reviews> a ldp:Container, sioc:Container, foaf:Document ;
+    gp:slug "reviews"^^xsd:string ;
+    sioc:has_space <> ;
+    dct:title "Reviews" .
+
+<tags> a ldp:Container, sioc:Container, foaf:Document ;
+    gp:slug "tags"^^xsd:string ;
+    sioc:has_space <> ;
+    dct:title "Tags" .
+
+<resources/labelled> a ldp:Container, sioc:Container, foaf:Document ;
+    sioc:has_space <resources> ;
+    dct:title "Labelled resources" .
+
+<properties/labelled> a ldp:Container, sioc:Container, foaf:Document ;
+    sioc:has_space <properties> ;
+    dct:title "Labelled properties" .
