@@ -32,6 +32,7 @@ limitations under the License.
     <!ENTITY sp     "http://spinrdf.org/sp#">
     <!ENTITY spin   "http://spinrdf.org/spin#">
     <!ENTITY list   "http://jena.hpl.hp.com/ARQ/list#">
+    <!ENTITY aht    "http://addhashtags.com/aht#">
     <!ENTITY gr     "http://purl.org/goodrelations/v1#">
     <!ENTITY rev    "http://purl.org/stuff/rev#">
 ]>
@@ -54,6 +55,7 @@ xmlns:void="&void;"
 xmlns:sp="&sp;"
 xmlns:ldp="&ldp;"
 xmlns:list="&list;"
+xmlns:aht="&aht;"
 xmlns:gr="&gr;"
 xmlns:rev="&rev;"
 exclude-result-prefixes="#all">
@@ -62,10 +64,43 @@ exclude-result-prefixes="#all">
     <xsl:import href="../../../org/graphity/client/xsl/group-sort-triples.xsl"/>
     <xsl:import href="../../../org/graphity/client/xsl/global-xhtml.xsl"/>
 
-    <xsl:preserve-space elements="gr:name skos:prefLabel rev:title"/>
+    <xsl:preserve-space elements="gr:name gr:hasMPN skos:prefLabel rev:title"/>
 
     <rdf:Description rdf:about="">
 	<dct:created rdf:datatype="&xsd;dateTime">2014-11-08T17:30:00+01:00</dct:created>
     </rdf:Description>
+
+    <xsl:template match="dct:subject/@rdf:resource | dct:subject/@rdf:nodeID" mode="gc:EditMode">
+        <select name="ou" id="{generate-id(..)}" multiple="multiple" size="8">
+            <xsl:apply-templates select="key('resources-by-type', '&aht;Category', document(resolve-uri('categories?limit=100', $gp:baseUri)))" mode="gc:OptionMode">
+                <xsl:sort select="gc:label(.)" order="ascending"/>
+                <xsl:with-param name="selected" select="../@rdf:resource"/>
+            </xsl:apply-templates>
+        </select>
+
+        <span class="help-inline">Resource</span>
+    </xsl:template>
+
+    <xsl:template match="gr:hasManufacturer/@rdf:resource | gr:hasManufacturer/@rdf:nodeID" mode="gc:EditMode">
+        <select name="ou" id="{generate-id(..)}" multiple="multiple" size="8">
+            <xsl:apply-templates select="key('resources-by-type', '&aht;Producer', document(resolve-uri('producers?limit=100', $gp:baseUri)))" mode="gc:OptionMode">
+                <xsl:sort select="gc:label(.)" order="ascending"/>
+                <xsl:with-param name="selected" select="../@rdf:resource"/>
+            </xsl:apply-templates>
+        </select>
+
+        <span class="help-inline">Resource</span>
+    </xsl:template>
+
+    <xsl:template match="aht:isReviewOf/@rdf:resource | aht:isReviewOf/@rdf:nodeID" mode="gc:EditMode">
+        <select name="ou" id="{generate-id(..)}" multiple="multiple" size="8">
+            <xsl:apply-templates select="key('resources-by-type', '&aht;Product', document(resolve-uri('products?limit=100', $gp:baseUri)))" mode="gc:OptionMode">
+                <xsl:sort select="gc:label(.)" order="ascending"/>
+                <xsl:with-param name="selected" select="../@rdf:resource"/>
+            </xsl:apply-templates>
+        </select>
+
+        <span class="help-inline">Resource</span>
+    </xsl:template>
 
 </xsl:stylesheet>

@@ -1,6 +1,7 @@
 @prefix rdf:	<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:	<http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd:	<http://www.w3.org/2001/XMLSchema#> .
+@prefix owl:	<http://www.w3.org/2002/07/owl#> .
 @prefix ldp:	<http://www.w3.org/ns/ldp#> .
 @prefix dct:	<http://purl.org/dc/terms/> .
 @prefix lda:	<http://purl.org/linked-data/api/vocab#> .
@@ -10,9 +11,13 @@
 @prefix gc:     <http://graphity.org/gc#> .
 @prefix gp:	<http://graphity.org/gp#> .
 @prefix gcs:	<http://graphity.org/gcs#> .
+@prefix aht:    <http://addhashtags.com/aht#> .
+@prefix gr:     <http://purl.org/goodrelations/v1#> .
+@prefix rev:    <http://purl.org/stuff/rev#> .
+@prefix skos:   <http://www.w3.org/2004/02/skos/core#> .
 
 <> a sioc:Space, ldp:Container, foaf:Document ;
-    dct:title "Add Hash Tags" ;
+    dct:title "Add Hashtags" ;
     dct:description "User reviews about experiences" ;
     foaf:maker <http://graphityhq.com/#company> .
 
@@ -55,3 +60,41 @@
 <properties/labelled> a ldp:Container, sioc:Container, foaf:Document ;
     sioc:has_space <properties> ;
     dct:title "Labelled properties" .
+
+# products
+
+<products/Coca-Cola> a foaf:Document, aht:ProductItem ;
+    foaf:primaryTopic <products/Coca-Cola#this> ;
+    sioc:has_container <products> ;
+    gp:slug "Coca-Cola" .
+
+<products/Coca-Cola#this> a gr:ProductOrServiceModel, aht:Product ;
+    foaf:isPrimaryTopicOf <products/Coca-Cola> ;
+    gr:name "Coca-Cola" ;
+    foaf:logo <http://upload.wikimedia.org/wikipedia/commons/c/ce/Coca-Cola_logo.svg> ;
+    gr:hasManufacturer <producers/The%20Coca-Cola%20Company#this> ;
+    owl:sameAs <http://dbpedia.org/resource/The_Coca-Cola_Company> .
+
+# categories
+
+<categories/drinks> a foaf:Document, aht:CategoryItem ;
+    foaf:primaryTopic <categories/drinks#this> ;
+    sioc:has_container <categories> ;
+    gp:slug "drinks" .
+
+<categories/drinks#this> a skos:Concept, aht:Category ;
+    foaf:isPrimaryTopicOf <categories/drinks> ;
+    skos:prefLabel "Drinks" .
+
+# producers
+
+<producers/The%20Coca-Cola%20Company> a foaf:Document, aht:ProducerItem ;
+    foaf:primaryTopic <producers/The%20Coca-Cola%20Company#this> ;
+    sioc:has_container <producers> ;
+    gp:slug "The Coca-Cola Company" .
+
+<producers/The%20Coca-Cola%20Company#this> a gr:BusinessEntity, aht:Producer ;
+    foaf:isPrimaryTopicOf <producers/The%20Coca-Cola%20Company> ;
+    gr:name "The Coca-Cola Company" ;
+    foaf:logo <http://upload.wikimedia.org/wikipedia/commons/c/ce/The_Coca-Cola_Company_logo.svg> ;
+    owl:sameAs <http://dbpedia.org/resource/The_Coca-Cola_Company> .

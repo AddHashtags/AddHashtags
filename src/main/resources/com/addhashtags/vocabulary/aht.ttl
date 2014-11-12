@@ -13,6 +13,7 @@
 @prefix dct:	<http://purl.org/dc/terms/> .
 @prefix gr:     <http://purl.org/goodrelations/v1#> .
 @prefix lda:	<http://purl.org/linked-data/api/vocab#> .
+@prefix rev:    <http://purl.org/stuff/rev#> .
 @prefix sp:	<http://spinrdf.org/sp#> .
 @prefix spin:	<http://spinrdf.org/spin#> .
 @prefix spl:	<http://spinrdf.org/spl#> .
@@ -20,7 +21,6 @@
 @prefix foaf:	<http://xmlns.com/foaf/0.1/> .
 @prefix nfo:    <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#> .
 @prefix dqc:	<http://semwebquality.org/ontologies/dq-constraints#> .
-@prefix rev:    <http://purl.org/stuff/rev#> .
 
 <#> a owl:Ontology, gp:Sitemap ;
     owl:imports gcs:, gc:, sp:, spin:, nfo:, lda:, foaf:, sioc:, rev: ;
@@ -59,12 +59,13 @@
     rdfs:isDefinedBy <#> .
 
 <#ProductItem> a rdfs:Class, owl:Class, gp:Template ;
-    rdfs:subClassOf foaf:Document, lda:ItemEndpoint , # <#Document>
+    rdfs:subClassOf foaf:Document, lda:ItemEndpoint,
         [ a owl:Restriction ;
             owl:onProperty sioc:has_container ;
             owl:allValuesFrom <#ProductContainer>
         ] ;
     gp:uriTemplate "/products/{slug}" ;
+    gp:skolemTemplate "/{slug}" ;
     gc:mode gc:ReadMode ;
     gc:defaultMode gc:ReadMode ;
     # gp:cacheControl "public, max-age=86400" ;
@@ -81,39 +82,51 @@
                     PREFIX gp:      <http://graphity.org/gp#>
                     PREFIX aht:     <http://addhashtags.com/aht#>
                     PREFIX gr:      <http://purl.org/goodrelations/v1#>
+                    PREFIX dct:     <http://purl.org/dc/terms/>
 
                     CONSTRUCT {
                         ?this a foaf:Document, aht:ProductItem ;
                             foaf:primaryTopic _:product ;
                             gp:slug " "^^xsd:string .
-                        _:product a aht:ProductOrServiceModel, gr:ProductOrServiceModel ;
+                        _:product a aht:Product, gr:ProductOrServiceModel ;
                             foaf:isPrimaryTopicOf ?this ;
-                            gr:name " " .
+                            gr:name " " ;
+                            gr:hasMPN " " ;
+                            gr:hasManufacturer _:producer ;
+                            dct:subject _:category .
                     }
                     WHERE {}"""
               ] ;
+    spin:constraint [ a dqc:MissingProperties ;
+	    sp:arg1 <#ProductItem> ;
+	    sp:arg2 gp:slug
+	] ;
     rdfs:label "Product document" ;
     rdfs:isDefinedBy <#> .
 
-<#ProductOrServiceModel> a rdfs:Class, owl:Class ;
+<#Product> a rdfs:Class, owl:Class ;
     rdfs:subClassOf gr:ProductOrServiceModel ,
         [ a owl:Restriction ;
             owl:onProperty foaf:isPrimaryTopicOf ;
-            owl:allValuesFrom <#ProductDocument>
+            owl:allValuesFrom <#ProductItem>
 	] ;
-    gp:uriTemplate "/products/{isPrimaryTopicOf.slug}" ;
+    gp:skolemTemplate "/{isPrimaryTopicOf.slug}" ;
     spin:constraint <#ConstructTypeViolation> , <#ConstructCategoryViolation> ,
         [ a dqc:MissingProperties ;
-	    sp:arg1 <#ProductOrServiceModel> ;
+	    sp:arg1 <#Product> ;
 	    sp:arg2 foaf:isPrimaryTopicOf
 	] ,
         [ a dqc:MissingProperties ;
-	    sp:arg1 <#ProductOrServiceModel> ;
+	    sp:arg1 <#Product> ;
 	    sp:arg2 gr:hasMPN
 	] ,
         [ a dqc:MissingProperties ;
-	    sp:arg1 <#ProductOrServiceModel> ;
+	    sp:arg1 <#Product> ;
 	    sp:arg2 gr:name
+	] ,
+        [ a dqc:MissingProperties ;
+	    sp:arg1 <#Product> ;
+	    sp:arg2 gr:hasManufacturer
 	] ;
     rdfs:isDefinedBy <#> .
 
@@ -250,6 +263,78 @@
     spin:constraint [ a dqc:MissingProperties ;
 	    sp:arg1 <#Review> ;
 	    sp:arg2 rev:title
+	] ,
+        [ a dqc:MissingProperties ;
+	    sp:arg1 <#Review> ;
+	    sp:arg2 <#isReviewOf>
 	] ;
     rdfs:label "Review" ;
+    rdfs:isDefinedBy <#> .
+
+# producers
+
+<#ProducerContainer> a owl:Class, gp:Template ;
+    rdfs:subClassOf foaf:Document, gp:Container, sioc:Container, ldp:Container, lda:ListEndpoint ;
+    gp:uriTemplate "/producers" ;
+    gp:limit 20 ;
+    gp:orderBy "name"^^xsd:string ;
+    gc:defaultMode gc:ListMode ;
+    gc:mode gc:ReadMode, gc:ListMode, gc:TableMode, gc:CreateMode ;
+    spin:query gp:DescribeWithChildren ;
+    rdfs:label "Review container" ;
+    rdfs:isDefinedBy <#> .
+
+<#ProducerItem> a rdfs:Class, owl:Class, gp:Template ;
+    rdfs:subClassOf foaf:Document, gp:Item, sioc:Item, lda:ItemEndpoint ,
+        [ a owl:Restriction ;
+            owl:onProperty sioc:has_container ;
+            owl:allValuesFrom <#ProducerContainer>
+        ] ;
+    gp:uriTemplate "/producers/{slug}" ;
+    gp:skolemTemplate "/{slug}" ;
+    gc:mode gc:ReadMode, gc:EditMode ;
+    gc:defaultMode gc:ReadMode ;
+    gp:cacheControl "public, max-age=3600" ;
+    spin:query gp:DescribeWithTopic ;
+    spin:update gp:DeleteWithTopic ;
+    spin:constructor
+              [ a       sp:Construct ;
+                sp:text """
+                    PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#>
+                    PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>
+                    PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
+                    PREFIX sioc:    <http://rdfs.org/sioc/ns#>
+                    PREFIX gp:      <http://graphity.org/gp#>
+                    PREFIX aht:     <http://addhashtags.com/aht#>
+                    PREFIX gr:      <http://purl.org/goodrelations/v1#>
+
+                    CONSTRUCT {
+                        ?this a foaf:Document, aht:ProducerItem ;
+                            foaf:primaryTopic _:producer ;
+                            gp:slug " "^^xsd:string .
+                        _:producer a aht:Producer, gr:BusinessEntity ;
+                            foaf:isPrimaryTopicOf ?this ;
+                            gr:name " " .
+                    }
+                    WHERE {}"""
+              ] ;
+    spin:constraint [ a dqc:MissingProperties ;
+	    sp:arg1 <#ProducerItem> ;
+	    sp:arg2 gp:slug
+	] ;
+    rdfs:label "Producer document" ;
+    rdfs:isDefinedBy <#> .
+
+<#Producer> a rdfs:Class, owl:Class ;
+    rdfs:subClassOf gr:BusinessEntity,
+        [ a owl:Restriction ;
+            owl:onProperty foaf:isPrimaryTopicOf ;
+            owl:allValuesFrom <#ProducerItem>
+	] ;
+    gp:skolemTemplate "/{isPrimaryTopicOf.slug}" ;
+    spin:constraint [ a dqc:MissingProperties ;
+	    sp:arg1 <#Producer> ;
+	    sp:arg2 gr:name
+	] ;
+    rdfs:label "Producer" ;
     rdfs:isDefinedBy <#> .
