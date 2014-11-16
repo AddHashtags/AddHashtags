@@ -154,7 +154,19 @@
     gc:mode gc:ReadMode, gc:EditMode ;
     gc:defaultMode gc:ReadMode ;
     gp:cacheControl "public, max-age=3600" ;
-    spin:query gp:DescribeWithTopic ;
+    spin:query [ a       sp:Describe ;
+                sp:text """
+                    PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>
+                    PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
+                    PREFIX dct:     <http://purl.org/dc/terms/>
+
+                    DESCRIBE ?this ?category ?product {
+                        ?category foaf:isPrimaryTopicOf ?this
+                        OPTIONAL {
+                            ?product dct:subject ?category
+                        }
+                    }"""
+              ] ;
     spin:update gp:DeleteWithTopic ;
     spin:constructor
               [ a       sp:Construct ;
@@ -222,7 +234,17 @@
     gc:mode gc:ReadMode, gc:EditMode ;
     gc:defaultMode gc:ReadMode ;
     gp:cacheControl "public, max-age=3600" ;
-    spin:query gp:DescribeWithTopic ;
+    spin:query [ a       sp:Describe ;
+                sp:text """
+                    PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>
+                    PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
+                    PREFIX aht:     <http://addhashtags.com/aht#>
+
+                    DESCRIBE ?this ?review ?product {
+                        ?review foaf:isPrimaryTopicOf ?this ;
+                            aht:isReviewOf ?product .
+                    }"""
+              ] ;
     spin:update gp:DeleteWithTopic ;
     spin:constructor
               [ a       sp:Construct ;
@@ -302,6 +324,7 @@
                 sp:text """
                     PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#>
                     PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>
+                    PREFIX owl:     <http://www.w3.org/2002/07/owl#>
                     PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
                     PREFIX sioc:    <http://rdfs.org/sioc/ns#>
                     PREFIX gp:      <http://graphity.org/gp#>
@@ -314,7 +337,9 @@
                             gp:slug " "^^xsd:string .
                         _:producer a aht:Producer, gr:BusinessEntity ;
                             foaf:isPrimaryTopicOf ?this ;
-                            gr:name " " .
+                            gr:name " " ;
+                            foaf:logo _:logo ;
+                            owl:sameAs _:sameAs .
                     }
                     WHERE {}"""
               ] ;

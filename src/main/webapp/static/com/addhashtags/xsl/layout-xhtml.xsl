@@ -26,15 +26,15 @@ limitations under the License.
     <!ENTITY sparql "http://www.w3.org/2005/sparql-results#">
     <!ENTITY ldp    "http://www.w3.org/ns/ldp#">
     <!ENTITY dct    "http://purl.org/dc/terms/">
-    <!ENTITY foaf   "http://xmlns.com/foaf/0.1/">
+    <!ENTITY gr     "http://purl.org/goodrelations/v1#">
+    <!ENTITY rev    "http://purl.org/stuff/rev#">
     <!ENTITY sioc   "http://rdfs.org/sioc/ns#">
     <!ENTITY void   "http://rdfs.org/ns/void#">
     <!ENTITY sp     "http://spinrdf.org/sp#">
     <!ENTITY spin   "http://spinrdf.org/spin#">
+    <!ENTITY foaf   "http://xmlns.com/foaf/0.1/">
     <!ENTITY list   "http://jena.hpl.hp.com/ARQ/list#">
     <!ENTITY aht    "http://addhashtags.com/aht#">
-    <!ENTITY gr     "http://purl.org/goodrelations/v1#">
-    <!ENTITY rev    "http://purl.org/stuff/rev#">
 ]>
 <xsl:stylesheet version="2.0"
 xmlns="http://www.w3.org/1999/xhtml"
@@ -82,7 +82,7 @@ exclude-result-prefixes="#all">
     </xsl:template>
 
     <xsl:template match="gr:hasManufacturer/@rdf:resource | gr:hasManufacturer/@rdf:nodeID" mode="gc:EditMode">
-        <select name="ou" id="{generate-id(..)}" multiple="multiple" size="8">
+        <select name="ou" id="{generate-id(..)}">
             <xsl:apply-templates select="key('resources-by-type', '&aht;Producer', document(resolve-uri('producers?limit=100', $gp:baseUri)))" mode="gc:OptionMode">
                 <xsl:sort select="gc:label(.)" order="ascending"/>
                 <xsl:with-param name="selected" select="../@rdf:resource"/>
@@ -93,7 +93,7 @@ exclude-result-prefixes="#all">
     </xsl:template>
 
     <xsl:template match="aht:isReviewOf/@rdf:resource | aht:isReviewOf/@rdf:nodeID" mode="gc:EditMode">
-        <select name="ou" id="{generate-id(..)}" multiple="multiple" size="8">
+        <select name="ou" id="{generate-id(..)}">
             <xsl:apply-templates select="key('resources-by-type', '&aht;Product', document(resolve-uri('products?limit=100', $gp:baseUri)))" mode="gc:OptionMode">
                 <xsl:sort select="gc:label(.)" order="ascending"/>
                 <xsl:with-param name="selected" select="../@rdf:resource"/>
@@ -101,6 +101,24 @@ exclude-result-prefixes="#all">
         </select>
 
         <span class="help-inline">Resource</span>
+    </xsl:template>
+
+    <xsl:template match="foaf:logo/@rdf:nodeID | owl:sameAs/@rdf:nodeID" mode="gc:EditMode">
+	<xsl:param name="type" select="'text'" as="xs:string"/>
+	<xsl:param name="id" as="xs:string?"/>
+	<xsl:param name="class" as="xs:string?"/>
+
+        <xsl:call-template name="gc:InputTemplate">
+            <xsl:with-param name="name" select="'ou'"/>
+            <xsl:with-param name="type" select="$type"/>
+            <xsl:with-param name="value" select="''"/>
+            <xsl:with-param name="id" select="$id"/>
+            <xsl:with-param name="class" select="$class"/>
+        </xsl:call-template>
+        
+        <xsl:if test="not($type = 'hidden')">
+            <span class="help-inline">Resource</span>
+        </xsl:if>
     </xsl:template>
 
 </xsl:stylesheet>

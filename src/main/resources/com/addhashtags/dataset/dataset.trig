@@ -73,6 +73,7 @@
     gr:name "Coca-Cola" ;
     foaf:logo <http://upload.wikimedia.org/wikipedia/commons/c/ce/Coca-Cola_logo.svg> ;
     gr:hasManufacturer <producers/The%20Coca-Cola%20Company#this> ;
+    dct:subject <categories/drinks#this> ;
     owl:sameAs <http://dbpedia.org/resource/The_Coca-Cola_Company> .
 
 # categories
@@ -96,5 +97,5 @@
 <producers/The%20Coca-Cola%20Company#this> a gr:BusinessEntity, aht:Producer ;
     foaf:isPrimaryTopicOf <producers/The%20Coca-Cola%20Company> ;
     gr:name "The Coca-Cola Company" ;
-    foaf:logo <http://upload.wikimedia.org/wikipedia/commons/c/ce/The_Coca-Cola_Company_logo.svg> ;
+    foaf:logo <http://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/The_Coca-Cola_Company_logo.svg/375px-The_Coca-Cola_Company_logo.svg.png> ;
     owl:sameAs <http://dbpedia.org/resource/The_Coca-Cola_Company> .
